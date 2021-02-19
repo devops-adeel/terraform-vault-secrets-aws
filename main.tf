@@ -3,17 +3,23 @@ locals {
   secret_type       = "aws"
 }
 
+# Credentials will be in the following environment variables:
+# AWS_ACCESS_KEY AWS_SECRET_KEY, AWS_REGION
+# It is best to create an "trusted" Lamba function which will trigger upon the
+# vault-audit log showing a successful request of aws-secrets-backend
+# the function is to send a POST the following endpoint: /aws/config/rotate-root
 resource "vault_aws_secret_backend" "default" {
-  credentials = var.credentials
-  description = "GCP Secrets Backend"
-}
-resource "vault_aws_secret_backend" "default" {
-  description = "GCP Secrets Backend"
+  description = "AWS Secrets Backend"
 }
 
 data "vault_policy_document" "default" {
   rule {
     path         = "${local.secret_type}/creds/{{identity.entity.metadata.env}}-{{identity.entity.metadata.service}}"
+    capabilities = ["read"]
+    description  = "Allow generation of, the end path name is the roleset name"
+  }
+  rule {
+    path         = "${local.secret_type}/sts/{{identity.entity.metadata.env}}-{{identity.entity.metadata.service}}"
     capabilities = ["read"]
     description  = "Allow generation of, the end path name is the roleset name"
   }
