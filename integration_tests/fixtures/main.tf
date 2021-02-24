@@ -39,6 +39,10 @@ resource "vault_aws_secret_backend_role" "default" {
 EOT
 }
 
+##
+## To validate Vault ACL policy, the code below shall be executed.
+##
+
 resource "vault_approle_auth_backend_login" "default" {
   backend   = module.vault_approle.backend_path
   role_id   = module.vault_approle.approle_id

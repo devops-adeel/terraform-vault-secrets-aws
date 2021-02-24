@@ -5,6 +5,8 @@ locals {
 
 # Credentials will be in the following environment variables:
 # AWS_ACCESS_KEY AWS_SECRET_KEY, AWS_REGION
+# https://www.vaultproject.io/api-docs/secret/aws#configure-root-iam-credentials
+#
 # It is best to create an "trusted" Lamba function which will trigger upon the
 # vault-audit log showing a successful request of aws-secrets-backend
 # the function is to send a POST the following endpoint: /aws/config/rotate-root
