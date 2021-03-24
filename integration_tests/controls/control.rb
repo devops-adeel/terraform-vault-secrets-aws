@@ -4,10 +4,13 @@
 # vi: set ft=ruby :
 #
 
-token     = attribute('token', description: 'token for vault')
-url       = attribute('url', description: 'url for vault')
-namespace = attribute('namespace', description: 'namespace for vault')
-path      = attribute('path', description: 'path for vault')
+content = inspec.profile.file('terraform.json')
+params = JSON.parse(content)
+
+token     = params['token']['value']
+url       = params['url']['value']
+namespace = params['namespace']['value']
+path      = params['path']['value']
 
 title "Vault Integration Test"
 
@@ -15,7 +18,7 @@ control "vlt-1.0" do
   impact 0.7
   title "Test access to AWS secret"
   desc "Test access to AWS secret"
-  describe http("#{url}/v1/#{namespace}/#{path}",
+  describe http("#{url}/v1/#{namespace}#{path}",
               method: 'GET',
               headers: {'X-Vault-Token' => "#{token}"}) do
     its('status') { should eq 200 }

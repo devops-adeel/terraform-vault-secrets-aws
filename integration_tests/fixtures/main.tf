@@ -1,7 +1,7 @@
 locals {
   application_name = "terraform-modules-development-aws"
   env              = "dev"
-  service          = "adeel"
+  service          = "web"
 }
 
 module "default" {
@@ -39,27 +39,8 @@ resource "vault_aws_secret_backend_role" "default" {
 EOT
 }
 
-##
-## To validate Vault ACL policy, the code below shall be executed.
-##
-
 resource "vault_approle_auth_backend_login" "default" {
   backend   = module.vault_approle.backend_path
   role_id   = module.vault_approle.approle_id
   secret_id = module.vault_approle.approle_secret
-}
-
-data "template_file" "default" {
-  template = file("attributes.tpl")
-  vars = {
-    token     = vault_approle_auth_backend_login.default.client_token
-    url       = var.vault_address
-    namespace = "admin/terraform-vault-secrets-aws/"
-    path      = format("aws/creds/%s-%s", local.env, local.service)
-  }
-}
-
-resource "local_file" "default" {
-  content  = data.template_file.default.rendered
-  filename = "${path.module}/../attributes/attributes.yml"
 }
